@@ -10,7 +10,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://linphone.org/maven_repository" }
+        maven {
+            url "https://download.linphone.org/releases/maven_repository"
+        }
     }
 }
 rootProject.name = "BasicSipDialer"
