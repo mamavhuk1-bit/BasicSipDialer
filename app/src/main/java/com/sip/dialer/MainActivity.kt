@@ -1,10 +1,13 @@
 package com.sip.dialer
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.ContactsContract
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,6 +25,9 @@ class MainActivity : AppCompatActivity() {
     private var currentCall: Call? = null
     private var isRecording = false
 
+    // Proximity Sensor WakeLock (Screen off near ear)
+    private var proximityWakeLock: PowerManager.WakeLock? = null
+
     // Quality tracking variables
     private var lastQualityRating = 0f
     private var lastPacketLoss = 0f
@@ -31,12 +37,15 @@ class MainActivity : AppCompatActivity() {
 
     // UI Elements
     private lateinit var tvStatus: TextView
+    private lateinit var btnToggleAccount: Button
+    private lateinit var layoutLoginCard: LinearLayout
     private lateinit var etUsername: EditText
     private lateinit var etPassword: EditText
     private lateinit var etDomain: EditText
     private lateinit var spinnerTransport: Spinner
     private lateinit var btnLogin: Button
     private lateinit var etDialNumber: EditText
+    private lateinit var btnBackspace: Button
     private lateinit var btnContacts: Button
     private lateinit var btnCall: Button
     private lateinit var layoutInCall: LinearLayout
@@ -46,7 +55,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnRecord: Button
     private lateinit var btnHangup: Button
 
-    // Contact Picker Launcher
     private val pickContactLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -63,7 +71,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Permission Launcher
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -82,20 +89,22 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread {
                 when (state) {
                     RegistrationState.Ok -> {
-                        tvStatus.text = "Status: Registered (${account.params.identityAddress?.username})"
-                        tvStatus.setTextColor(0xFF2E7D32.toInt())
+                        tvStatus.text = "● Connected (${account.params.identityAddress?.username})"
+                        tvStatus.setTextColor(0xFF69F0AE.toInt())
+                        layoutLoginCard.visibility = View.GONE
                     }
                     RegistrationState.Progress -> {
-                        tvStatus.text = "Status: Registering..."
-                        tvStatus.setTextColor(0xFFF57C00.toInt())
+                        tvStatus.text = "● Connecting..."
+                        tvStatus.setTextColor(0xFFFFD740.toInt())
                     }
                     RegistrationState.Failed -> {
-                        tvStatus.text = "Status: Failed ($message)"
-                        tvStatus.setTextColor(0xFFD32F2F.toInt())
+                        tvStatus.text = "● Failed ($message)"
+                        tvStatus.setTextColor(0xFFFF5252.toInt())
+                        layoutLoginCard.visibility = View.VISIBLE
                     }
                     else -> {
-                        tvStatus.text = "Status: Not Registered"
-                        tvStatus.setTextColor(0xFFD32F2F.toInt())
+                        tvStatus.text = "● Offline"
+                        tvStatus.setTextColor(0xFFFF5252.toInt())
                     }
                 }
             }
@@ -113,6 +122,7 @@ class MainActivity : AppCompatActivity() {
                         currentCall = call
                         layoutInCall.visibility = View.VISIBLE
                         tvCallState.text = "Calling ${call.remoteAddress.username ?: call.remoteAddress.asStringUriOnly()}..."
+                        enableProximitySensor(true)
                     }
                     Call.State.IncomingReceived -> {
                         currentCall = call
@@ -122,9 +132,11 @@ class MainActivity : AppCompatActivity() {
                         currentCall = call
                         layoutInCall.visibility = View.VISIBLE
                         tvCallState.text = "Connected: ${call.remoteAddress.username ?: "Active Call"}"
+                        enableProximitySensor(true)
                         captureCallMetrics(call)
                     }
                     Call.State.End, Call.State.Released -> {
+                        enableProximitySensor(false)
                         if (isRecording) {
                             call.stopRecording()
                             isRecording = false
@@ -135,6 +147,7 @@ class MainActivity : AppCompatActivity() {
                         showCallQualitySummary()
                     }
                     Call.State.Error -> {
+                        enableProximitySensor(false)
                         layoutInCall.visibility = View.GONE
                         currentCall = null
                         Toast.makeText(this@MainActivity, "Call Error: $message", Toast.LENGTH_LONG).show()
@@ -154,19 +167,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         initViews()
+        setupProximitySensor()
         requestAppPermissions()
         initLinphoneCore()
+        setupDialpad()
         setupListeners()
+        loadSavedCredentialsAndAutoLogin()
     }
 
     private fun initViews() {
         tvStatus = findViewById(R.id.tvStatus)
+        btnToggleAccount = findViewById(R.id.btnToggleAccount)
+        layoutLoginCard = findViewById(R.id.layoutLoginCard)
         etUsername = findViewById(R.id.etUsername)
         etPassword = findViewById(R.id.etPassword)
         etDomain = findViewById(R.id.etDomain)
         spinnerTransport = findViewById(R.id.spinnerTransport)
         btnLogin = findViewById(R.id.btnLogin)
         etDialNumber = findViewById(R.id.etDialNumber)
+        btnBackspace = findViewById(R.id.btnBackspace)
         btnContacts = findViewById(R.id.btnContacts)
         btnCall = findViewById(R.id.btnCall)
         layoutInCall = findViewById(R.id.layoutInCall)
@@ -177,7 +196,97 @@ class MainActivity : AppCompatActivity() {
         btnHangup = findViewById(R.id.btnHangup)
 
         val transports = arrayOf("UDP", "TCP", "TLS")
-        spinnerTransport.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, transports)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, transports)
+        spinnerTransport.adapter = adapter
+    }
+
+    private fun setupProximitySensor() {
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (powerManager.isWakeLockLevelSupported(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK)) {
+            proximityWakeLock = powerManager.newWakeLock(
+                PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+                "BasicSipDialer::ProximityLock"
+            )
+        }
+    }
+
+    private fun enableProximitySensor(enable: Boolean) {
+        try {
+            if (enable) {
+                if (proximityWakeLock?.isHeld == false) {
+                    proximityWakeLock?.acquire(60 * 60 * 1000L) // Max 1 hour safety timeout
+                }
+            } else {
+                if (proximityWakeLock?.isHeld == true) {
+                    proximityWakeLock?.release()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun setupDialpad() {
+        val dialButtons = mapOf(
+            R.id.btn0 to "0", R.id.btn1 to "1", R.id.btn2 to "2",
+            R.id.btn3 to "3", R.id.btn4 to "4", R.id.btn5 to "5",
+            R.id.btn6 to "6", R.id.btn7 to "7", R.id.btn8 to "8",
+            R.id.btn9 to "9", R.id.btnStar to "*", R.id.btnHash to "#"
+        )
+
+        for ((id, digit) in dialButtons) {
+            findViewById<Button>(id).setOnClickListener { view ->
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                etDialNumber.append(digit)
+                // Send DTMF if inside an active call
+                currentCall?.sendDtmf(digit[0])
+            }
+        }
+
+        btnBackspace.setOnClickListener {
+            val text = etDialNumber.text.toString()
+            if (text.isNotEmpty()) {
+                etDialNumber.setText(text.substring(0, text.length - 1))
+                etDialNumber.setSelection(etDialNumber.text.length)
+            }
+        }
+
+        btnBackspace.setOnLongClickListener {
+            etDialNumber.setText("")
+            true
+        }
+    }
+
+    private fun loadSavedCredentialsAndAutoLogin() {
+        val prefs = getSharedPreferences("SipPrefs", Context.MODE_PRIVATE)
+        val savedUser = prefs.getString("username", "") ?: ""
+        val savedPass = prefs.getString("password", "") ?: ""
+        val savedDomain = prefs.getString("domain", "") ?: ""
+        val savedTransport = prefs.getString("transport", "UDP") ?: "UDP"
+
+        if (savedUser.isNotEmpty() && savedPass.isNotEmpty() && savedDomain.isNotEmpty()) {
+            etUsername.setText(savedUser)
+            etPassword.setText(savedPass)
+            etDomain.setText(savedDomain)
+            val pos = when (savedTransport) {
+                "TCP" -> 1
+                "TLS" -> 2
+                else -> 0
+            }
+            spinnerTransport.setSelection(pos)
+            layoutLoginCard.visibility = View.GONE
+            registerSipAccount(savedUser, savedPass, savedDomain, savedTransport)
+        }
+    }
+
+    private fun saveCredentials(user: String, pass: String, domain: String, transport: String) {
+        val prefs = getSharedPreferences("SipPrefs", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString("username", user)
+            .putString("password", pass)
+            .putString("domain", domain)
+            .putString("transport", transport)
+            .apply()
     }
 
     private fun requestAppPermissions() {
@@ -190,13 +299,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun initLinphoneCore() {
         val factory = Factory.instance()
-        factory.setDebugMode(true, "BasicSipDialer")
+        factory.setDebugMode(false, "BasicSipDialer")
         core = factory.createCore(null, null, this)
         core.addListener(coreListener)
         core.start()
     }
 
     private fun setupListeners() {
+        btnToggleAccount.setOnClickListener {
+            layoutLoginCard.visibility =
+                if (layoutLoginCard.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
+
         btnLogin.setOnClickListener {
             val user = etUsername.text.toString().trim()
             val pass = etPassword.text.toString().trim()
@@ -207,6 +321,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please fill all SIP fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            saveCredentials(user, pass, domain, transportStr)
             registerSipAccount(user, pass, domain, transportStr)
         }
 
@@ -242,9 +357,11 @@ class MainActivity : AppCompatActivity() {
             if (currentDevice?.type == AudioDevice.Type.Speaker && earpiece != null) {
                 core.outputAudioDevice = earpiece
                 btnSpeaker.text = "Speaker"
+                enableProximitySensor(true)
             } else if (speaker != null) {
                 core.outputAudioDevice = speaker
                 btnSpeaker.text = "Earpiece"
+                enableProximitySensor(false) // Keep screen on when on loudspeaker
             }
         }
 
@@ -308,7 +425,6 @@ class MainActivity : AppCompatActivity() {
         val recordFile = File(recordDir, "Call_$timestamp.wav")
         callParams.recordFile = recordFile.absolutePath
 
-        // Reset metrics
         lastQualityRating = 0f
         lastPacketLoss = 0f
         lastJitter = 0f
@@ -343,7 +459,7 @@ class MainActivity : AppCompatActivity() {
         if (stats != null) {
             lastPacketLoss = stats.receiverLossRate
             lastJitter = stats.jitterBufferSizeMs
-            lastDelay = stats.roundTripDelay * 1000f // convert to ms
+            lastDelay = stats.roundTripDelay * 1000f
         }
         call.currentParams?.usedAudioPayloadType?.let {
             lastCodec = "${it.mimeType}/${it.clockRate}"
@@ -379,6 +495,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        enableProximitySensor(false)
         core.removeListener(coreListener)
         core.stop()
     }
