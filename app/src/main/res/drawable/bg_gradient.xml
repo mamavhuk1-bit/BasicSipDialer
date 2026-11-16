@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base Teal-Indigo-Purple Gradient matching reference -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#0D4B5E"
+                android:centerColor="#352B68"
+                android:endColor="#1D6A7B"
+                android:type="linear" />
+        </shape>
+    </item>
+    <!-- Soft Violet Glow Accent -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:centerX="0.78"
+                android:centerY="0.48"
+                android:gradientRadius="340dp"
+                android:startColor="#888A4FFF"
+                android:centerColor="#446539C0"
+                android:endColor="#00000000"
+                android:type="radial" />
+        </shape>
+    </item>
+    <!-- Soft Cyan Wave Glow -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:centerX="0.22"
+                android:centerY="0.62"
+                android:gradientRadius="280dp"
+                android:startColor="#5526C6DA"
+                android:endColor="#00000000"
+                android:type="radial" />
+        </shape>
+    </item>
+</layer-list>

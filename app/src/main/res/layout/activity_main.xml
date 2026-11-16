@@ -1,270 +1,341 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient"
-    android:fillViewport="true">
+    android:background="@drawable/bg_gradient">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomGlassNav"
+        android:fillViewport="true">
 
-        <!-- Top Status & Account Toggle Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#33000000"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Status: Not Registered"
-                android:textColor="#FF5252"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btnToggleAccount"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:backgroundTint="#37474F"
-                android:text="Account"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp" />
-        </LinearLayout>
-
-        <!-- Collapsible SIP Login Card -->
-        <LinearLayout
-            android:id="@+id/layoutLoginCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="#26FFFFFF"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="14dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="10dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SIP Account Settings"
-                android:textColor="#80DEEA"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/etUsername"
+            <!-- Top Status & Live Ping Pill -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Username / Extension"
-                android:inputType="text"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#B0BEC5" />
+                android:background="@drawable/bg_glass_bar"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp">
 
-            <EditText
-                android:id="@+id/etPassword"
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="● Offline"
+                    android:textColor="#FF8A80"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvLivePing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#26000000"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="3dp"
+                    android:text="📶 -- ms"
+                    android:textColor="#80DEEA"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Collapsible SIP Account Card -->
+            <LinearLayout
+                android:id="@+id/layoutLoginCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#B0BEC5" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_glass_bar"
+                android:orientation="vertical"
+                android:padding="14dp">
 
-            <EditText
-                android:id="@+id/etDomain"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Domain / Server IP"
-                android:inputType="textUri"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#B0BEC5" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚙️ SIP Account Settings"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
 
-            <Spinner
-                android:id="@+id/spinnerTransport"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:layout_marginTop="4dp"
-                android:backgroundTint="#FFFFFF" />
+                <EditText
+                    android:id="@+id/etUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Username / Extension"
+                    android:inputType="text"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#B0BEC5" />
 
-            <Button
-                android:id="@+id/btnLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:backgroundTint="#00B0FF"
-                android:text="Save &amp; Connect"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
-        </LinearLayout>
+                <EditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#B0BEC5" />
 
-        <!-- Number Display & Backspace -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:background="#26000000"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp">
+                <EditText
+                    android:id="@+id/etDomain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Domain / Server IP"
+                    android:inputType="textUri"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#B0BEC5" />
 
+                <Spinner
+                    android:id="@+id/spinnerTransport"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="4dp"
+                    android:backgroundTint="#FFFFFF" />
+
+                <Button
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#00B0FF"
+                    android:text="Save &amp; Connect"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Large Clean Number Display -->
             <EditText
                 android:id="@+id/etDialNumber"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="6dp"
                 android:background="@android:color/transparent"
                 android:gravity="center"
                 android:hint="Enter Number"
                 android:inputType="phone"
+                android:maxLines="1"
                 android:textColor="#FFFFFF"
-                android:textColorHint="#78909C"
-                android:textSize="26sp"
+                android:textColorHint="#80FFFFFF"
+                android:textSize="32sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnBackspace"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:backgroundTint="#37474F"
-                android:text="⌫"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <!-- Unique Circular Dialpad Grid -->
-        <GridLayout
-            android:id="@+id/dialpadGrid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="14dp"
-            android:columnCount="3"
-            android:rowCount="4">
-
-            <Button android:id="@+id/btn1" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="1" android:textColor="#FFFFFF" android:textSize="24sp" />
-            <Button android:id="@+id/btn2" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="2" android:textColor="#FFFFFF" android:textSize="24sp" />
-            <Button android:id="@+id/btn3" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="3" android:textColor="#FFFFFF" android:textSize="24sp" />
-
-            <Button android:id="@+id/btn4" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="4" android:textColor="#FFFFFF" android:textSize="24sp" />
-            <Button android:id="@+id/btn5" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="5" android:textColor="#FFFFFF" android:textSize="24sp" />
-            <Button android:id="@+id/btn6" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="6" android:textColor="#FFFFFF" android:textSize="24sp" />
-
-            <Button android:id="@+id/btn7" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="7" android:textColor="#FFFFFF" android:textSize="24sp" />
-            <Button android:id="@+id/btn8" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="8" android:textColor="#FFFFFF" android:textSize="24sp" />
-            <Button android:id="@+id/btn9" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="9" android:textColor="#FFFFFF" android:textSize="24sp" />
-
-            <Button android:id="@+id/btnStar" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="*" android:textColor="#80DEEA" android:textSize="24sp" />
-            <Button android:id="@+id/btn0" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="0" android:textColor="#FFFFFF" android:textSize="24sp" />
-            <Button android:id="@+id/btnHash" android:layout_width="74dp" android:layout_height="74dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="#" android:textColor="#80DEEA" android:textSize="24sp" />
-        </GridLayout>
-
-        <!-- Contacts & Call Action Row -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnContacts"
-                android:layout_width="0dp"
-                android:layout_height="54dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="#455A64"
-                android:text="Contacts"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btnCall"
-                android:layout_width="0dp"
-                android:layout_height="54dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1.5"
-                android:backgroundTint="#00C853"
-                android:text="CALL"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- In-Call Controls Panel -->
-        <LinearLayout
-            android:id="@+id/layoutInCall"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="#CC102027"
-            android:orientation="vertical"
-            android:padding="14dp"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/tvCallState"
-                android:layout_width="match_parent"
+            <!-- Circular Glass Dialpad with Sub-letters -->
+            <GridLayout
+                android:id="@+id/dialpadGrid"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Calling..."
-                android:textColor="#69F0AE"
-                android:textSize="17sp"
-                android:textStyle="bold" />
+                android:layout_gravity="center"
+                android:columnCount="3"
+                android:rowCount="4">
 
+                <Button android:id="@+id/btn1" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="1\n " android:textColor="#FFFFFF" android:textSize="22sp" />
+                <Button android:id="@+id/btn2" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="2\nABC" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <Button android:id="@+id/btn3" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="3\nDEF" android:textColor="#FFFFFF" android:textSize="18sp" />
+
+                <Button android:id="@+id/btn4" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="4\nGHI" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <Button android:id="@+id/btn5" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="5\nJKL" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <Button android:id="@+id/btn6" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="6\nMNO" android:textColor="#FFFFFF" android:textSize="18sp" />
+
+                <Button android:id="@+id/btn7" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="7\nPQRS" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <Button android:id="@+id/btn8" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="8\nTUV" android:textColor="#FFFFFF" android:textSize="18sp" />
+                <Button android:id="@+id/btn9" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="9\nWXYZ" android:textColor="#FFFFFF" android:textSize="18sp" />
+
+                <Button android:id="@+id/btnStar" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="*" android:textColor="#FFFFFF" android:textSize="26sp" />
+                <Button android:id="@+id/btn0" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:lineSpacingExtra="-2dp" android:text="0\n+" android:textColor="#FFFFFF" android:textSize="20sp" />
+                <Button android:id="@+id/btnHash" android:layout_width="76dp" android:layout_height="76dp" android:layout_margin="8dp" android:background="@drawable/bg_dial_btn" android:text="#" android:textColor="#FFFFFF" android:textSize="24sp" />
+            </GridLayout>
+
+            <!-- Bottom Dial Action Row: Recordings | Glowing Green CALL | Backspace -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btnMute"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:backgroundTint="#37474F"
-                    android:text="Mute"
+                    android:id="@+id/btnRecordingsList"
+                    android:layout_width="78dp"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/bg_glass_bar"
+                    android:text="🎧 Recs"
+                    android:textAllCaps="false"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp" />
 
                 <Button
-                    android:id="@+id/btnSpeaker"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="6dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="#37474F"
-                    android:text="Speaker"
+                    android:id="@+id/btnCall"
+                    android:layout_width="74dp"
+                    android:layout_height="74dp"
+                    android:background="@drawable/bg_call_btn"
+                    android:text="📞"
                     android:textColor="#FFFFFF"
-                    android:textSize="12sp" />
+                    android:textSize="28sp" />
 
                 <Button
-                    android:id="@+id/btnRecord"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:backgroundTint="#37474F"
-                    android:text="Record"
+                    android:id="@+id/btnBackspace"
+                    android:layout_width="78dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="20dp"
+                    android:background="@drawable/bg_glass_bar"
+                    android:text="⌫"
                     android:textColor="#FFFFFF"
-                    android:textSize="12sp" />
+                    android:textSize="18sp" />
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btnHangup"
+            <!-- In-Call Controls Panel -->
+            <LinearLayout
+                android:id="@+id/layoutInCall"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="#D50000"
-                android:text="END CALL"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="#CC102027"
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:visibility="gone">
 
+                <TextView
+                    android:id="@+id/tvCallState"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Calling..."
+                    android:textColor="#69F0AE"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvCallTimer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="⏱ 00:00"
+                    android:textColor="#FFD740"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnMute"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="#37474F"
+                        android:text="🔇 Mute"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/btnSpeaker"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="6dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#37474F"
+                        android:text="🔊 Speaker"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp" />
+
+                    <Button
+                        android:id="@+id/btnRecord"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="#37474F"
+                        android:text="⏺ Record"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnHangup"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:backgroundTint="#D50000"
+                    android:text="📵 END CALL"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Glass Navigation Bar matching reference -->
+    <LinearLayout
+        android:id="@+id/bottomGlassNav"
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_glass_bar"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="6dp">
+
+        <Button
+            android:id="@+id/btnNavKeypad"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="🔢\nKeypad"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/btnRecentCalls"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="🕒\nRecents"
+            android:textAllCaps="false"
+            android:textColor="#E0F7FA"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/btnContacts"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="👤\nContacts"
+            android:textAllCaps="false"
+            android:textColor="#E0F7FA"
+            android:textSize="11sp" />
+
+        <Button
+            android:id="@+id/btnToggleAccount"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="⚙️\nSettings"
+            android:textAllCaps="false"
+            android:textColor="#E0F7FA"
+            android:textSize="11sp" />
     </LinearLayout>
-</ScrollView>
+
+</RelativeLayout>
